@@ -23,6 +23,8 @@ public class CategoryEntity {
     private String name;
     @Column(name="image", length = 250, nullable = false)
     private String image;
+    @Column(name="is_delete", nullable = false)
+    private boolean isDelete;
     @Column(name="description", length = 250, nullable = false)
     private String description;
     @JsonManagedReference

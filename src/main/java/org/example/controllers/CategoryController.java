@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.example.dto.category.CategoryCreateDTO;
 import org.example.dto.category.CategoryItemDTO;
@@ -7,6 +8,7 @@ import org.example.dto.category.CategoryUpdateDTO;
 import org.example.entities.CategoryEntity;
 import org.example.mappers.CategoryMapper;
 import org.example.repositories.CategoryRepository;
+import org.example.storage.FileSaveFormat;
 import org.example.storage.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,18 +20,23 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("api/categories")
+@SecurityRequirement(name="my-api")
 public class CategoryController {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final StorageService storageService;
-    @GetMapping("/category")
+    @GetMapping()
     public ResponseEntity<List<CategoryItemDTO>> index() {
         List<CategoryItemDTO> items = categoryMapper.listCategoriesToItemDTO(categoryRepository.findAll());
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
-    @PostMapping(value = "/category", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CategoryItemDTO create(@ModelAttribute CategoryCreateDTO dto) {
-        String fileName = storageService.saveMultipartFile(dto.getImage());
+        //String fileName = storageService.saveMultipartFile(dto.getImage());
+        String fileName = storageService.saveThumbnailator(dto.getImage(), FileSaveFormat.WEBP);
+
+
         CategoryEntity cat = CategoryEntity
                 .builder()
                 .name(dto.getName())
